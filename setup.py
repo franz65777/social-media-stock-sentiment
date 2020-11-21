@@ -4,19 +4,21 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="kenoAPI",
-    version="2.0.0",
+    name="wsb-sentiment",
+    version="1.0.0",
     author="Joshua David Golafshan",
-    description="Python-based API used to fetch real-time and historical data from the Australian Keno website.",
+    description="Python-based API. Finds tickers on the subreddit of 'WallStreetBets'",
     # long_description=long_description,
     # long_description_content_type="text/markdown",
     url="https://github.com/JGolafshan/KenoAPI",
-    keywords=["keno API", "keno", "algo", "algobetting"],
-    packages=["keno"],
+    keywords=["trading", "algo" "stock", "sentiment", "wallstreetbets"],
+    packages=["app"],
     install_requires=[
-        'datetime',
+        're',
+        'os',
+        'praw',
         'pandas',
-        'requests',
+        'datetime'
     ],
     package_dir=setuptools.find_packages(),
     classifiers=[

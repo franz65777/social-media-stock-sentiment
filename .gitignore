@@ -2,4 +2,7 @@
 /venv/
 /original/
 /.idea/
+/build/
+/wsb_sentiment.egg-info/
+/dist/
 app/WSBAuthentication.py

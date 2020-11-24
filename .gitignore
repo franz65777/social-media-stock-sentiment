@@ -6,3 +6,6 @@
 /wsb_sentiment.egg-info/
 /dist/
 app/WSBAuthentication.py
+*.xlsx
+tests.py
+tests.py

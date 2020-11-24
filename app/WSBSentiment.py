@@ -50,7 +50,7 @@ class WallStreetBetsSentiment:
     def debug(self):
         save_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\logs"
         return self.__break_up_data.to_excel(save_file + "\\log-{}.xlsx".format(
-            dt.datetime.now().strftime("T%H.%M.%S_D%Y-%m-%d")), sheet_name='WSB Comments')
+            dt.datetime.now().strftime("D%Y-%m-%d_T%H.%M.%S")), sheet_name='Log')
 
     # loops though comments to find tickers in self.ticker_list
     def parser(self, enable_debug=bool):

@@ -15,13 +15,13 @@ sia = SentimentIntensityAnalyzer()
 class Ticker:
     
 
-    def __init__(self, ticker):
+    def __init__(self, ticker): #pass the comment into ticker
         self.ticker = ticker
         self.comments = []
         self.titles = []
         self.sentiment = []
         self.count = 0
-
+    # Remove this 
     def get_comments(self):
         for comment in commentlist:
             if len(re.findall((r'\s{}\s').format(self.ticker), comment)) > 0:
@@ -40,7 +40,7 @@ class Ticker:
                     
             
             
-        
+ #Call ticker in WSBSentiment        
 objlist = []
 for ticker in tickerlist:
     objlist.append(Ticker(ticker))

@@ -4,47 +4,48 @@ import os
 import praw
 import pandas as pd
 import datetime as dt
+import app.WSBTicker as wsbt
 
 
 class WallStreetBetsSentiment:
     def __init__(self, autho_dict, posts):
-        self.__authentication = autho_dict
-        self.__posts = posts
-        self.__comment_list = []
-        self.__title_list = []
+        self.authentication = autho_dict
+        self.posts = posts
+        self.comment_list = []
+        self.title_list = []
+        self.tickers = []
         self.__ticker_list = pd.read_csv(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\dependencies\\ticker_list.csv")
-        self.__sia = SentimentIntensityAnalyzer()
 
     @property
     # creates instance of reddit using authenticaton from app.WSBAuthentication
     def __connect(self):
         return praw.Reddit(
-            client_id=self.__authentication.get("app_id"),
-            client_secret=self.__authentication.get("secret"),
-            username=self.__authentication.get("username"),
-            password=self.__authentication.get("password"),
-            user_agent=self.__authentication.get("user_agent")
+            client_id=self.authentication.get("app_id"),
+            client_secret=self.authentication.get("secret"),
+            username=self.authentication.get("username"),
+            password=self.authentication.get("password"),
+            user_agent=self.authentication.get("user_agent")
         )
 
     @property
     # fetches data from a specified subreddit using a filter method e.g. recent, hot
     def __fetch_data(self):
         sub = self.__connect.subreddit("wallstreetbets")  # select subreddit
-        new_wsb = sub.hot(limit=self.__posts)  # sorts by new and pulls the last 1000 posts of r/wsb
+        new_wsb = sub.hot(limit=self.posts)  # sorts by new and pulls the last 1000 posts of r/wsb
         return new_wsb
 
     @property
     # saves the comments of posts to a dataframe
     def __break_up_data(self):
         for submission in self.__fetch_data:
-            self.__title_list.append(submission.title)  # creates list of post subjects, elements strings
+            self.title_list.append(submission.title)  # creates list of post subjects, elements strings
             submission.comments.replace_more(limit=1)
 
             for comment in submission.comments.list():
                 dictionary_data = {comment.body}
-                self.__comment_list.append(dictionary_data)
-        return pd.DataFrame(self.__comment_list, columns=['Comments'])
+                self.comment_list.append(dictionary_data)
+        return pd.DataFrame(self.comment_list, columns=['Comments'])
 
     # saves all comments to a csv document saved in 'logs'
     def debug(self):
@@ -60,24 +61,29 @@ class WallStreetBetsSentiment:
         ticker_count_list = []
 
         for ticker in ticker_list:
-            count = []
-            sentiment = 0
             for comment in comment_list:
                 # count = count + re.findall((r'\s{}\s').format(ticker), str(comment))
-                count = count + re.findall((' ' + ticker + ' '), str(comment))
+                find_ticker = re.findall((' ' + ticker + ' '), str(comment))
 
-                if len(count) > 0:
-                    score = self.__sia.polarity_scores(comment)
-                    sentiment = score['compound']  # adding all the compound sentiments
-            if len(count) > 0:
-                ticker_count_list.append([ticker, len(count), (sentiment / len(count))])
+                if len(find_ticker) > 0:
+                    ticker_instance = wsbt.Ticker(ticker=ticker)
+
+                    if len(self.tickers) > 0:
+                        for ticker_array in self.tickers:
+                            for stock_dict in ticker_array:
+                                stock_dict = {}
+                                if stock_dict.get("ticker") == str(ticker):
+                                    stock_dict["mentions"] = ticker_instance.increment_count()
+
+
+
+                    else:
+                        self.tickers.append(ticker_instance.main())
 
         if enable_debug is True:
             self.debug()
 
         else:
             pass
-        # ISSUE: the re.findall function would return match on AIN if someone says PAIN
-        df4 = pd.DataFrame(ticker_count_list, columns=['Ticker', 'Count', 'Sentiment'])
-        df4 = df4.sort_values(by='Count', ascending=False)
-        return df4
+
+        return self.tickers

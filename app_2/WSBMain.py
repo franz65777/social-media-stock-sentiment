@@ -19,10 +19,14 @@ class WallStreetBets(DP):
 
                 if len(find_ticker) > 0:
                     ticker_instance = tker.Ticker(ticker=ticker)
-                    if any(self.tickers) is True:
-                        for i in self.tickers:
-                            if i[0] == ticker:
-                                i[1] = i[1] + 1
+                    for i in self.tickers:
+                        print(i)
+                        if i[0] == ticker:
+                            ticker_instance.increment_count()
+                            ticker_instance.append_comments(comment=comment)
+
+
+
 
 
                     else:

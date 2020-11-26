@@ -21,6 +21,8 @@ class Ticker:
         self.titles = []
         self.sentiment = []
         self.count = 0
+        self.positions = [] #added positions collector
+        
     # Remove this 
     def get_comments(self):
         for comment in commentlist:
@@ -37,6 +39,15 @@ class Ticker:
             score = sia.polarity_scores(comment)
             sentiment = score['compound']
             self.sentiment.append(sentiment)
+            
+    def get_positions(self):
+        #positions are in form SPY 300c 11/20
+        for comment in self.comments: 
+            position = re.findall(r'{}\s\d+\w\s\d+\S\d+'.format(self.ticker), comment)
+            if position != []:
+                self.positions.append(position)
+        return self.positions
+ 
                     
             
             

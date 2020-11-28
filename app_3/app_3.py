@@ -86,9 +86,10 @@ class WallStreetBets:
 
         return final_list
 
-
+master_comments = pd.read_csv(
+            os.path.dirname(os.path.dirname(os.path.abspath(file))) + "\logs\log.csv")
 class Ticker:
-    def __init__(self, ticker, comment_list):
+    def __init__(self, ticker):
         self.ticker = ticker
         self.ticker_list = pd.read_csv(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\dependencies\\ticker_list.csv")
@@ -101,7 +102,7 @@ class Ticker:
         self.positions = []
 
     def get_comments(self):
-        for comment in list(self.comment_list['Comments'].unique()):
+        for comment in master_comments:
             if len(re.findall((r'\b{}\b').format(self.ticker), str(comment))) > 0:
                 self.comments.append(comment)
         return self.comments

@@ -6,3 +6,5 @@
 * collopses fetch_data and break_up_data into a single function -  Not Started
 * use a try statement for loading excel file - Not Started
 * speed up for loops/ refactor create function -  Not Started
+* change log file type csv -  Not Started
+* change "" to '' -  Not Started

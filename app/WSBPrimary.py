@@ -29,7 +29,7 @@ class WallStreetBets:
     @property
     # fetches data from a specified subreddit using a filter method e.g. recent, hot
     # saves the comments of posts to a dataframe
-    def read_data(self):
+    def read_submissions(self):
         sub = self.connect.subreddit('wallstreetbets')  # select subreddit
         new_wsb = sub.hot(limit=self.posts)  # sorts by new and pulls the last 1000 posts of r/wsb
 

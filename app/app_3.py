@@ -1,10 +1,9 @@
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import os
-import praw
 import re
+import praw
 import pandas as pd
 import datetime as dt
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import xlrd
 
 
 class WallStreetBets:
@@ -57,7 +56,6 @@ class WallStreetBets:
         objlist = []
         for ticker in self.ticker_list['Symbol'].unique():
             objlist.append(Ticker(ticker=ticker))
-        print(objlist)
 
         for obj in objlist:
             obj.get_comments()
@@ -67,8 +65,6 @@ class WallStreetBets:
         for obj in objlist:
             if obj.count > 0:
                 final_list.append(obj)
-
-        print(final_list)
 
         for obj in final_list:
             obj.analyzer()

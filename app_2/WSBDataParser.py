@@ -39,12 +39,18 @@ class DataParser:
             submission.comments.replace_more(limit=1)
 
             for comment in submission.comments.list():
-                dictionary_data = {comment.body}
+                dictionary_data = [
+                    dt.datetime.utcfromtimestamp(comment.created_utc).strftime("%Y-%m-%d %H:%M:%S"),
+                    str(comment.author),
+                    comment.score,
+                    comment.body
+                ]
                 self.comment_list.append(dictionary_data)
-        return pd.DataFrame(self.comment_list, columns=['Comments'])
+        return pd.DataFrame(self.comment_list, columns=['Date Created', 'Author', 'Score', 'Comments'])
 
+    @staticmethod
     # saves all comments to a csv document saved in 'logs'
-    def debug(self):
+    def debug(self, data=pd.DataFrame()):
         save_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\logs"
-        return self.break_up_data.to_excel(save_file + "\\log-{}.xlsx".format(
+        return data.to_excel(save_file + "\\log-{}.xlsx".format(
             dt.datetime.now().strftime("D%Y-%m-%d_T%H.%M.%S")), sheet_name='Log')

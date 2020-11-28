@@ -10,24 +10,19 @@ class WallStreetBets(DP):
 
     def parser(self, enable_debug=bool):
         ticker_list = list(self.ticker_list['Symbol'].unique())
-        comment_list = list(self.break_up_data['Comments'].unique())
+        comment_list = self.break_up_data
+        comment_list_filtered = list(comment_list['Comments'].unique())
 
         for ticker in ticker_list:
-            for comment in comment_list:
-                # count = count + re.findall((r'\s{}\s').format(ticker), str(comment))
-                find_ticker = re.findall((' ' + ticker + ' '), str(comment))
+            for comment in comment_list_filtered:
+                find_ticker = re.findall(r'\b{}\b'.format(ticker), str(comment))
 
                 if len(find_ticker) > 0:
                     ticker_instance = tker.Ticker(ticker=ticker)
                     for i in self.tickers:
-                        print(i)
                         if i[0] == ticker:
                             ticker_instance.increment_count()
                             ticker_instance.append_comments(comment=comment)
-
-
-
-
 
                     else:
                         ticker_instance.increment_count()
@@ -35,6 +30,7 @@ class WallStreetBets(DP):
                         self.tickers.append(ticker_instance.useable())
 
         if enable_debug is True:
-            self.debug()
+            print("debug")
+            self.debug(data=comment_list)
 
         return self.tickers

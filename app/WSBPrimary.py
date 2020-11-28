@@ -16,7 +16,7 @@ class WallStreetBets:
         self.ticker_list = pd.read_csv(self.dir_name + '\\dependencies\\ticker_list.csv')
 
     @property
-    # creates instance of reddit using authenticaton from app.WSBAuthentication
+    # creates instance of reddit using authentication from app.WSBAuthentication
     def connect(self):
         return praw.Reddit(
             client_id=self.authentication.get('app_id'),
@@ -53,16 +53,16 @@ class WallStreetBets:
 
     # creates a ticker object for each ticker in ticker_list
     def create(self):
-        objlist = []
+        obj_list = []
         for ticker in self.ticker_list['Symbol'].unique():
-            objlist.append(Ticker(ticker=ticker))
+            obj_list.append(Ticker(ticker=ticker))
 
-        for obj in objlist:
+        for obj in obj_list:
             obj.get_comments()
             obj.get_count()
 
         final_list = []
-        for obj in objlist:
+        for obj in obj_list:
             if obj.count > 0:
                 final_list.append(obj)
 
@@ -86,7 +86,7 @@ class Ticker:
         self.sentiment = []
         self.sia = SentimentIntensityAnalyzer()
         self.count = 0
-        self.avgsent = 0
+        self.avg_sent = 0
         self.positions = []
 
     def get_comments(self):
@@ -113,8 +113,8 @@ class Ticker:
                 sent += sentiment
                 counter += 1
         if counter > 0:
-            self.avgsent = round(sent / counter, ndigits=2)
-        return self.avgsent
+            self.avg_sent = round(sent / counter, ndigits=2)
+        return self.avg_sent
 
     def get_positions(self):
         # positions are in form SPY 300c 11/20
@@ -129,5 +129,5 @@ class Ticker:
         return {
             "ticker": self.ticker,
             "total_mentions": self.count,
-            "avg_sentiment": self.avgsent
+            "avg_sentiment": self.avg_sent
         }

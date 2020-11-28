@@ -5,5 +5,5 @@ import os
 import pandas as pd
 
 instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)
-
-print(instance.break_up_data)
+data = instance.read_data
+instance.debug(data=data)

@@ -4,25 +4,17 @@ import re
 import pandas as pd
 import datetime as dt
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import xlrd
 
 
 class WallStreetBets:
     def __init__(self, autho_dict, posts):
+        self.title_list = []
         self.authentication = autho_dict
         self.posts = posts
         self.comment_list = []
-        self.title_list = []
         self.ticker_list = pd.read_csv(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\dependencies\\ticker_list.csv")
-        self.comments = []
-        # self.titles = []
-        self.sentiment = []
-        # self.pos_sent = []
-        # self.neg_sent = []
-        self.sia = SentimentIntensityAnalyzer()
-        self.count = 0
-        self.avgsent = 0
-        self.positions = []
 
     @property
     # creates instance of reddit using authenticaton from app.WSBAuthentication
@@ -86,14 +78,14 @@ class WallStreetBets:
 
         return final_list
 
-master_comments = pd.read_csv(
-            os.path.dirname(os.path.dirname(os.path.abspath(file))) + "\logs\log.csv")
+
+master_comments = list(pd.read_excel("E:\\Golafshan Capital\\wsb-sentiment\\logs\\log.xlsx")["Comments"])
+
+
 class Ticker:
     def __init__(self, ticker):
         self.ticker = ticker
-        self.ticker_list = pd.read_csv(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\dependencies\\ticker_list.csv")
-        self.comment_list = comment_list
+        self.comment_list = 0
         self.comments = []
         self.sentiment = []
         self.sia = SentimentIntensityAnalyzer()
@@ -103,7 +95,7 @@ class Ticker:
 
     def get_comments(self):
         for comment in master_comments:
-            if len(re.findall((r'\b{}\b').format(self.ticker), str(comment))) > 0:
+            if len(re.findall(r'\b{}\b'.format(self.ticker), str(comment))) > 0:
                 self.comments.append(comment)
         return self.comments
 

@@ -6,7 +6,7 @@ import datetime as dt
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
-class DataParser:
+class WallStreetBets:
     def __init__(self, autho_dict, posts):
         self.authentication = autho_dict
         self.posts = posts

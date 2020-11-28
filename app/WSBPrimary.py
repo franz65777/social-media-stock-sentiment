@@ -123,3 +123,11 @@ class Ticker:
             if position != []:
                 self.positions.append(position)
         return self.positions
+
+    @property
+    def get_values(self):
+        return {
+            "ticker": self.ticker,
+            "total_mentions": self.count,
+            "avg_sentiment": self.avgsent
+        }

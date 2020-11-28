@@ -61,13 +61,47 @@ class WallStreetBets:
 
     @staticmethod
     # saves all comments to a csv document saved in 'logs'
-    def debug(self, data=pd.DataFrame()):
+    def debug(data=pd.DataFrame()):
         save_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\logs"
-        return data.to_excel(save_file + "\\log-{}.xlsx".format(
-            dt.datetime.now().strftime("D%Y-%m-%d_T%H.%M.%S")), sheet_name='Log')
+        return data.to_excel(save_file + "\\log.xlsx", sheet_name='Log')
+
+    def create(self):
+        objlist = []
+        for ticker in self.ticker_list['Symbol'].unique():
+            objlist.append(Ticker(ticker=ticker))
+
+        for obj in objlist:
+            obj.get_comments()
+            obj.get_count()
+
+        final_list = []
+        for obj in objlist:
+            if obj.count > 0:
+                final_list.append(obj)
+
+        for obj in final_list:
+            obj.analyzer()
+            obj.average_sentiment()
+            obj.get_positions()
+
+        return final_list
+
+
+class Ticker:
+    def __init__(self, ticker, comment_list):
+        self.ticker = ticker
+        self.ticker_list = pd.read_csv(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\dependencies\\ticker_list.csv")
+        self.comment_list = comment_list
+        self.comments = []
+        self.sentiment = []
+        self.sia = SentimentIntensityAnalyzer()
+        self.count = 0
+        self.avgsent = 0
+        self.positions = []
 
     def get_comments(self):
-        for comment in list(self.break_up_data['Comments'].unique()):
+        for comment in list(self.comment_list['Comments'].unique()):
             if len(re.findall((r'\b{}\b').format(self.ticker), str(comment))) > 0:
                 self.comments.append(comment)
         return self.comments

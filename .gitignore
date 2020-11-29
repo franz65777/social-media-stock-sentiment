@@ -9,3 +9,4 @@ app/WSBAuthentication.py
 *.xlsx
 tests.py
 tests.py
+!\venv\Lib\site-packages\vaderSentiment

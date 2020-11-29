@@ -4,21 +4,40 @@ import re
 import praw
 import pandas as pd
 import datetime as dt
-import numpy as np
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 
-class WallStreetBets:
+class WSBBase:
+    def __init__(self):
+        self.dir_name = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.ticker_list = pd.read_csv(self.dir_name + '\\dependencies\\ticker_list.csv')
+        self.master_comments = list(pd.read_csv(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '\\dependencies\\log.csv')['Comments'])
+
+    # saves all comments to a csv document saved in 'logs'
+    def debug(self, data=pd.DataFrame()):
+        return data.to_csv(self.dir_name + '\\dependencies\\log.csv')
+
+
+class SubmissionStructure:
+    """
+    Used for historical and live data
+    calculates all parameters
+    a substitute for the ticker class
+    """
+    pass
+
+
+class WallStreetBets(WSBBase):
     def __init__(self, autho_dict, posts):
+        super().__init__()
         self.title_list = []
         self.authentication = autho_dict
-        self.dir_name = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.posts = posts
         self.comment_list = []
-        self.ticker_list = pd.read_csv(self.dir_name + '\\dependencies\\ticker_list.csv')
 
     @property
     # creates instance of reddit using authenticaton from app.WSBAuthentication
@@ -57,10 +76,6 @@ class WallStreetBets:
         for comment in subreddit.stream.comments(skip_existing=True):
             print(comment.body)
 
-    # saves all comments to a csv document saved in 'logs'
-    def debug(self, data=pd.DataFrame()):
-        return data.to_csv(self.dir_name + '\\dependencies\\log.csv')
-
     # creates a ticker object for each ticker in ticker_list
     def create(self):
         objlist = []
@@ -84,12 +99,9 @@ class WallStreetBets:
         return final_list
 
 
-master_comments = list(pd.read_csv(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '\\dependencies\\log.csv')['Comments'])
-
-
-class Ticker:
+class Ticker(WSBBase):
     def __init__(self, ticker):
+        super().__init__()
         self.ticker = ticker
         self.comment_list = 0
         self.comments = []
@@ -100,7 +112,7 @@ class Ticker:
         self.positions = []
 
     def get_comments(self):
-        for comment in master_comments:
+        for comment in self.master_comments:
             if len(re.findall(r'\b{}\b'.format(self.ticker), str(comment))) > 0:
                 self.comments.append(comment)
         return self.comments

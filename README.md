@@ -9,11 +9,6 @@
 * port wsb vader sentiment to our repo. - **Not Started**
 * sql database  - **Not Started**
 * add extra keywords sentiment booster **Not Started**
-* 
-
-
-
-
 
 * change log file type csv -  **Completed**
 * change "" to '' -  **Completed**

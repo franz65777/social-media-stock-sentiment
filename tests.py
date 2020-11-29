@@ -5,7 +5,4 @@ import os
 import pandas as pd
 
 instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)
-data = instance.create()
-
-for obj in data:
-    pprint(obj.get_values)
+data = instance.live_data()

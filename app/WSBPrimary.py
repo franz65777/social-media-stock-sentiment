@@ -4,6 +4,11 @@ import re
 import praw
 import pandas as pd
 import datetime as dt
+import numpy as np
+
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
 
 
 class WallStreetBets:
@@ -46,6 +51,11 @@ class WallStreetBets:
                 ]
                 self.comment_list.append(dictionary_data)
         return pd.DataFrame(self.comment_list, columns=['Date Created', 'Author', 'Score', 'Comments'])
+
+    def live_data(self):
+        subreddit = self.connect.subreddit("wallstreetbets")
+        for comment in subreddit.stream.comments(skip_existing=True):
+            print(comment.body)
 
     # saves all comments to a csv document saved in 'logs'
     def debug(self, data=pd.DataFrame()):

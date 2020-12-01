@@ -140,10 +140,14 @@ class Ticker(WSBBase):
 
     def get_positions(self):
         # positions are in form SPY 300c 11/20
+        # alt_format is in form 11/20 SPY 300c
         for comment in self.comments:
             position = re.findall(r'{}\s\d+\w\s\d+\S\d+'.format(self.ticker), comment)
+            alt_format = re.findall(r'\d+\S\d+\s{}\s\d+'.format(self.ticker), comment)
             if position != []:
                 self.positions.append(position)
+            if alt_format != []:
+                self.positions.append(alt_format)
         return self.positions
 
     @property

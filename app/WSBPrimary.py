@@ -4,8 +4,9 @@ import re
 import praw
 import pandas as pd
 import datetime as dt
+import numpy as np
 
-pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_rows', 50000)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
@@ -14,21 +15,14 @@ class WSBBase:
     def __init__(self):
         self.dir_name = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.ticker_list = pd.read_csv(self.dir_name + '\\dependencies\\ticker_list.csv')
-        self.master_comments = list(pd.read_csv(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '\\dependencies\\log.csv')['Comments'])
+
+        self.master_comments = pd.read_csv(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '\\dependencies\\log.csv').drop(
+            ["Unnamed: 0"], axis=1)
 
     # saves all comments to a csv document saved in 'logs'
     def debug(self, data=pd.DataFrame()):
         return data.to_csv(self.dir_name + '\\dependencies\\log.csv')
-
-
-class SubmissionStructure:
-    """
-    Used for historical and live data
-    calculates all parameters
-    a substitute for the ticker class
-    """
-    pass
 
 
 class WallStreetBets(WSBBase):

@@ -8,11 +8,8 @@ import re
 
 instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)
 
-data_0 = instance.read_submissions
-data_0["Ticker"] = ""
+#data_0 = instance.read_submissions
 
-for index, row in data_0.iterrows():
-    for ticker in instance.ticker_list["Symbol"]:
-        row["Ticker"] = ticker
+x= WSB.DataFrameWSB()
 
-print(data_0.head(50))
+print(x.data())

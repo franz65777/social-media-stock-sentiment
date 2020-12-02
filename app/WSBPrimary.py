@@ -70,84 +70,42 @@ class WallStreetBets(WSBBase):
         for comment in subreddit.stream.comments(skip_existing=True):
             print(comment.body)
 
-    # creates a ticker object for each ticker in ticker_list
-    def create(self):
-        obj_list = []
-        for ticker in self.ticker_list['Symbol'].unique():
-            obj_list.append(Ticker(ticker=ticker))
 
-        for obj in obj_list:
-            obj.get_comments()
-            obj.get_count()
-
-        final_list = []
-        for obj in obj_list:
-            if obj.count > 0:
-                final_list.append(obj)
-
-        for obj in final_list:
-            obj.analyzer()
-            obj.average_sentiment()
-            obj.get_positions()
-
-        return final_list
-
-
-class Ticker(WSBBase):
-    def __init__(self, ticker):
+class DataFrameWSB(WSBBase):
+    def __init__(self):
         super().__init__()
-        self.ticker = ticker
-        self.comment_list = 0
-        self.comments = []
-        self.sentiment = []
+        self.data_frame = self.master_comments
         self.sia = SentimentIntensityAnalyzer()
-        self.count = 0
-        self.avg_sent = 0
-        self.positions = []
 
-    def get_comments(self):
-        for comment in self.master_comments:
-            if len(re.findall(r'\b{}\b'.format(self.ticker), str(comment))) > 0:
-                self.comments.append(comment)
-        return self.comments
+    def __sentiment(self):
+        result = []
+        for value in self.data_frame["Comments"]:
+            score = self.sia.polarity_scores(value)['compound']
+            sentiment = score
+            result.append(sentiment)
 
-    def get_count(self):
-        self.count = len(self.comments)
-        return self.count
+        self.data_frame["Sentiment"] = result
 
-    def analyzer(self):
-        for comment in self.comments:
-            score = self.sia.polarity_scores(comment)
-            sentiment = score['compound']
-            self.sentiment.append(sentiment)
+        return self.data_frame
 
-    def average_sentiment(self):
-        counter = 0
-        sent = 0
-        for sentiment in self.sentiment:
-            if sentiment != 0:
-                sent += sentiment
-                counter += 1
-        if counter > 0:
-            self.avg_sent = round(sent / counter, ndigits=2)
-        return self.avg_sent
+    def __ticker(self):
+        tickers = []
+        for comment in self.data_frame["Comments"]:
+            for ticker_name in self.ticker_list["Symbol"]:
+                if len(re.findall(r'\b{}\b'.format(ticker_name), str(comment))) > 0:
+                    tickers.append(ticker_name)
+                    print(ticker_name)
 
-    def get_positions(self):
-        # positions are in form SPY 300c 11/20
-        # alt_format is in form 11/20 SPY 300c
-        for comment in self.comments:
-            position = re.findall(r'{}\s\d+\w\s\d+\S\d+'.format(self.ticker), comment)
-            alt_format = re.findall(r'\d+\S\d+\s{}\s\d+'.format(self.ticker), comment)
-            if position != []:
-                self.positions.append(position)
-            if alt_format != []:
-                self.positions.append(alt_format)
-        return self.positions
+                else:
+                    tickers.append(np.nan)
 
-    @property
-    def get_values(self):
-        return {
-            "ticker": self.ticker,
-            "total_mentions": self.count,
-            "avg_sentiment": self.avg_sent
-        }
+        self.data_frame["Ticker"] = tickers
+        return self.data_frame
+
+    def __positions(self):
+        pass
+
+    def data(self):
+        self.__ticker()
+        self.__sentiment()
+        return self.data_frame

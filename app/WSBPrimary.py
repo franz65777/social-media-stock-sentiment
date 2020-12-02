@@ -89,15 +89,12 @@ class DataFrameWSB(WSBBase):
         return self.data_frame
 
     def __ticker(self):
+        self.data_frame["Ticker"] = np.nan
         tickers = []
         for comment in self.data_frame["Comments"]:
             for ticker_name in self.ticker_list["Symbol"]:
                 if len(re.findall(r'\b{}\b'.format(ticker_name), str(comment))) > 0:
                     tickers.append(ticker_name)
-                    print(ticker_name)
-
-                else:
-                    tickers.append(np.nan)
 
         self.data_frame["Ticker"] = tickers
         return self.data_frame

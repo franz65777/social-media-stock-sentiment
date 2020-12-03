@@ -12,4 +12,6 @@ instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)
 
 x= WSB.DataFrameWSB()
 
-print(x.data())
+test= x.data().where(x.data()["Ticker"] == "PLTR")
+
+print(test)

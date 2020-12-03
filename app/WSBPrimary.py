@@ -47,8 +47,20 @@ class WallStreetBets(WSBBase):
     @property
     # fetches data from a specified subreddit using a filter method e.g. recent, hot
     # saves the comments of posts to a dataframe
-    def read_submissions(self):
+    def read_submissions(self, mode=str()):
         sub = self.connect.subreddit('wallstreetbets')  # select subreddit
+        mode = mode.lower()
+
+        if mode == "new":
+            pass
+        if mode == "hot":
+            pass
+        if mode == "live":
+            pass
+
+
+
+
         new_wsb = sub.hot(limit=self.posts)  # sorts by new and pulls the last 1000 posts of r/wsb
 
         for submission in new_wsb:
@@ -92,15 +104,22 @@ class DataFrameWSB(WSBBase):
         self.data_frame["Ticker"] = np.nan
         tickers = []
         for comment in self.data_frame["Comments"]:
+            usedFlag = 0
             for ticker_name in self.ticker_list["Symbol"]:
-                if len(re.findall(r'\b{}\b'.format(ticker_name), str(comment))) > 0:
+                ticker_pattern = re.compile(r'\b%s\b' % ticker_name)
+                if len(re.findall(ticker_pattern, str(comment))) > 0:
                     tickers.append(ticker_name)
+                    usedFlag = 1
+                    break  # fixes length bug
+            if usedFlag == 0:
+                tickers.append(np.NaN)
 
         self.data_frame["Ticker"] = tickers
         return self.data_frame
 
     def __positions(self):
         pass
+
 
     def data(self):
         self.__ticker()

@@ -2,8 +2,9 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import os
 import re
 import praw
-import pandas as pd
+import sqlite3 as sql
 import datetime as dt
+import pandas as pd
 import numpy as np
 
 pd.set_option('display.max_rows', 50000)
@@ -77,7 +78,13 @@ class WallStreetBets(WSBBase):
     def live_data(self):
         subreddit = self.connect.subreddit("wallstreetbets")
         for comment in subreddit.stream.comments(skip_existing=True):
-            print(comment.body)
+            dictionary_data = {
+                "datetime": dt.datetime.utcfromtimestamp(comment.created_utc).strftime('%Y-%m-%d %H:%M:%S'),
+                "user": str(comment.author),
+                "upvotes": comment.score,
+                "text": comment.body
+            }
+            print(dictionary_data)
 
 
 class DataFrameWSB(WSBBase):
@@ -104,7 +111,7 @@ class DataFrameWSB(WSBBase):
             usedFlag = 0
             for ticker_name in self.ticker_list["Symbol"]:
                 ticker_pattern = re.compile(r'\b%s\b' % ticker_name)
-                if len(re.findall(ticker_pattern, str(comment))) > 0:
+                if len(ticker_pattern.findall(str(comment))) > 0:
                     tickers.append(ticker_name)
                     usedFlag = 1
                     break  # fixes length bug
@@ -121,3 +128,16 @@ class DataFrameWSB(WSBBase):
         self.__ticker()
         self.__sentiment()
         return self.data_frame
+
+
+class DataBase:
+    def __init__(self):
+        self.database = sql
+
+    @property
+    def connect(self):
+        return sql.connect('WallStreetBets.db')
+
+    @property
+    def cursor(self):
+        return self.connect.cursor()

@@ -6,10 +6,9 @@ import pandas as pd
 import numpy as np
 import re
 
+re.purge()
+
 instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)
 
-data_0 = instance.read_submissions(mode="hot")
-
-transfrom = WSB.DataFrameWSB(data_frame=data_0)
-
-print(transfrom.data())
+data_0 = instance.live_data()
+print(data_0)

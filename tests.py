@@ -6,9 +6,4 @@ import pandas as pd
 import numpy as np
 import re
 
-re.purge()
-
-instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)
-
-data_0 = instance.live_data()
-print(data_0)
+#instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)

@@ -128,16 +128,3 @@ class DataFrameWSB(WSBBase):
         self.__ticker()
         self.__sentiment()
         return self.data_frame
-
-
-class DataBase:
-    def __init__(self):
-        self.database = sql
-
-    @property
-    def connect(self):
-        return sql.connect('WallStreetBets.db')
-
-    @property
-    def cursor(self):
-        return self.connect.cursor()

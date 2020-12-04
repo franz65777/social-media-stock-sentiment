@@ -28,10 +28,8 @@ class WSBBase:
 class WallStreetBets(WSBBase):
     def __init__(self, autho_dict, posts):
         super().__init__()
-        self.title_list = []
         self.authentication = autho_dict
         self.posts = posts
-        self.comment_list = []
 
     @property
     # creates instance of reddit using authentication from app.WSBAuthentication
@@ -44,38 +42,37 @@ class WallStreetBets(WSBBase):
             user_agent=self.authentication.get('user_agent')
         )
 
-    @property
     # fetches data from a specified subreddit using a filter method e.g. recent, hot
     # saves the comments of posts to a dataframe
-    def read_submissions(self, mode=str()):
+    def read_submissions(self, mode):
         sub = self.connect.subreddit('wallstreetbets')  # select subreddit
+        submission_type = None
         mode = mode.lower()
+        comment_list = []
 
         if mode == "new":
-            pass
-        if mode == "hot":
-            pass
-        if mode == "live":
-            pass
+            submission_type = sub.new(limit=self.posts)
+        elif mode == "hot":
+            submission_type = sub.hot(limit=self.posts)
 
+        elif mode == "rising":
+            submission_type = sub.rising(limit=self.posts)
 
+        else:
+            exit("Error: 1 - mode type not recognised. Mode Types (new, hot, rising, live)")
 
-
-        new_wsb = sub.hot(limit=self.posts)  # sorts by new and pulls the last 1000 posts of r/wsb
-
-        for submission in new_wsb:
-            self.title_list.append(submission.title)  # creates list of post subjects, elements strings
+        for submission in submission_type:
             submission.comments.replace_more(limit=1)
 
             for comment in submission.comments.list():
-                dictionary_data = [
-                    dt.datetime.utcfromtimestamp(comment.created_utc).strftime('%Y-%m-%d %H:%M:%S'),
-                    str(comment.author),
-                    comment.score,
-                    comment.body
-                ]
-                self.comment_list.append(dictionary_data)
-        return pd.DataFrame(self.comment_list, columns=['Date Created', 'Author', 'Score', 'Comments'])
+                dictionary_data = {
+                    "datetime": dt.datetime.utcfromtimestamp(comment.created_utc).strftime('%Y-%m-%d %H:%M:%S'),
+                    "user": str(comment.author),
+                    "upvotes": comment.score,
+                    "text": comment.body
+                }
+                comment_list.append(dictionary_data)
+        return pd.DataFrame.from_records(data=comment_list)
 
     def live_data(self):
         subreddit = self.connect.subreddit("wallstreetbets")
@@ -84,14 +81,14 @@ class WallStreetBets(WSBBase):
 
 
 class DataFrameWSB(WSBBase):
-    def __init__(self):
+    def __init__(self, data_frame):
         super().__init__()
-        self.data_frame = self.master_comments
+        self.data_frame = data_frame
         self.sia = SentimentIntensityAnalyzer()
 
     def __sentiment(self):
         result = []
-        for value in self.data_frame["Comments"]:
+        for value in self.data_frame["text"]:
             score = self.sia.polarity_scores(value)['compound']
             sentiment = score
             result.append(sentiment)
@@ -103,7 +100,7 @@ class DataFrameWSB(WSBBase):
     def __ticker(self):
         self.data_frame["Ticker"] = np.nan
         tickers = []
-        for comment in self.data_frame["Comments"]:
+        for comment in self.data_frame["text"]:
             usedFlag = 0
             for ticker_name in self.ticker_list["Symbol"]:
                 ticker_pattern = re.compile(r'\b%s\b' % ticker_name)
@@ -119,7 +116,6 @@ class DataFrameWSB(WSBBase):
 
     def __positions(self):
         pass
-
 
     def data(self):
         self.__ticker()

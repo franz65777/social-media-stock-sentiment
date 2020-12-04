@@ -8,10 +8,8 @@ import re
 
 instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)
 
-#data_0 = instance.read_submissions
+data_0 = instance.read_submissions(mode="hot")
 
-x= WSB.DataFrameWSB()
+transfrom = WSB.DataFrameWSB(data_frame=data_0)
 
-test= x.data().where(x.data()["Ticker"] == "PLTR")
-
-print(test)
+print(transfrom.data())

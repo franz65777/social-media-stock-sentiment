@@ -1,19 +1,15 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from app.WSBDatabase import *
 import os
 import re
 import praw
-import sqlite3 as sql
 import datetime as dt
 import pandas as pd
-import numpy as np
-
-pd.set_option('display.max_rows', 50000)
-pd.set_option('display.max_columns', 500)
-pd.set_option('display.width', 1000)
 
 
 class WSBBase:
     def __init__(self):
+        self.sia = SentimentIntensityAnalyzer()
         self.dir_name = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.ticker_list = pd.read_csv(self.dir_name + '\\dependencies\\ticker_list.csv')
 
@@ -75,56 +71,38 @@ class WallStreetBets(WSBBase):
                 comment_list.append(dictionary_data)
         return pd.DataFrame.from_records(data=comment_list)
 
-    def live_data(self):
+    def live_submissions(self):
         subreddit = self.connect.subreddit("wallstreetbets")
+
         for comment in subreddit.stream.comments(skip_existing=True):
-            dictionary_data = {
-                "datetime": dt.datetime.utcfromtimestamp(comment.created_utc).strftime('%Y-%m-%d %H:%M:%S'),
-                "user": str(comment.author),
-                "upvotes": comment.score,
-                "text": comment.body
-            }
-            print(dictionary_data)
+            Submission().insert_submission(
+                date=dt.datetime.utcfromtimestamp(comment.created_utc).strftime('%Y-%m-%d %H:%M:%S'),
+                user=str(comment.author), upvotes=comment.score, text=comment.body,
+                ticker=self.ticker(text=comment.body),
+                sentiment=self.sia.polarity_scores(comment.body)['compound'],
+                position=""
+            )
 
+    def ticker(self, text):
+        usedFlag = 0
+        ticker = ""
+        for ticker_name in self.ticker_list["Symbol"]:
+            ticker_pattern = re.compile(r'\b%s\b' % ticker_name)
+            if len(ticker_pattern.findall(str(text))) > 0:
+                usedFlag = 1
+                ticker = ticker_name
+                return ticker
+        if usedFlag == 0:
+            ticker = ""
+            return ticker
 
-class DataFrameWSB(WSBBase):
-    def __init__(self, data_frame):
-        super().__init__()
-        self.data_frame = data_frame
-        self.sia = SentimentIntensityAnalyzer()
+    def position(self, text):
+        position = re.findall(r'{}\s\d+\w\s\d+\S\d+'.format(self.ticker), text)
+        alt_format = re.findall(r'\d+\S\d+\s{}\s\d+'.format(self.ticker), text)
+        print(position, alt_format)
 
-    def __sentiment(self):
-        result = []
-        for value in self.data_frame["text"]:
-            score = self.sia.polarity_scores(value)['compound']
-            sentiment = score
-            result.append(sentiment)
+        if len(position) > 0:
+            return str(position)
 
-        self.data_frame["Sentiment"] = result
-
-        return self.data_frame
-
-    def __ticker(self):
-        self.data_frame["Ticker"] = np.nan
-        tickers = []
-        for comment in self.data_frame["text"]:
-            usedFlag = 0
-            for ticker_name in self.ticker_list["Symbol"]:
-                ticker_pattern = re.compile(r'\b%s\b' % ticker_name)
-                if len(ticker_pattern.findall(str(comment))) > 0:
-                    tickers.append(ticker_name)
-                    usedFlag = 1
-                    break  # fixes length bug
-            if usedFlag == 0:
-                tickers.append(np.NaN)
-
-        self.data_frame["Ticker"] = tickers
-        return self.data_frame
-
-    def __positions(self):
-        pass
-
-    def data(self):
-        self.__ticker()
-        self.__sentiment()
-        return self.data_frame
+        if len(alt_format) > 0:
+            return str(alt_format)

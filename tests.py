@@ -3,14 +3,12 @@ import app.WSBPrimary as WSB
 from pprint import pprint
 import os
 import pandas as pd
-import numpy as np
 import re
 import mysql.connector
 import praw
-from pushshift_py import PushshiftAPI as PSAPI
 import datetime as dt
 
-conn = praw.Reddit(
+"""conn = praw.Reddit(
     client_id=creds.autho.get('app_id'),
     client_secret=creds.autho.get('secret'),
     username=creds.autho.get('username'),
@@ -34,7 +32,8 @@ for comment in comment_list:
     appended_data.append(data)
 
 dataframe = pd.DataFrame(appended_data, columns=["Datetime", "Author", "Upvotes", "Body"])
-dataframe.to_csv(path_or_buf="E:\\Golafshan Capital\\wsb-sentiment\\dependencies\\test.csv")
+dataframe.to_csv(path_or_buf="E:\\Golafshan Capital\\wsb-sentiment\\dependencies\\test.csv")"""
 
-# instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)
-# instance.live_submissions()
+instance = WSB.WallStreetBets(autho_dict=creds.autho, posts=1)
+instance.live_submissions()
+

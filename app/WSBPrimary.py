@@ -80,7 +80,7 @@ class WallStreetBets(WSBBase):
                 user=str(comment.author), upvotes=comment.score, text=comment.body,
                 ticker=self.ticker(text=comment.body),
                 sentiment=self.sia.polarity_scores(comment.body)['compound'],
-                position=""
+                position="NULL"
             )
 
     def ticker(self, text):

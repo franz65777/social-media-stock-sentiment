@@ -95,14 +95,3 @@ class WallStreetBets(WSBBase):
         if usedFlag == 0:
             ticker = ""
             return ticker
-
-    def position(self, text):
-        position = re.findall(r'{}\s\d+\w\s\d+\S\d+'.format(self.ticker), text)
-        alt_format = re.findall(r'\d+\S\d+\s{}\s\d+'.format(self.ticker), text)
-        print(position, alt_format)
-
-        if len(position) > 0:
-            return str(position)
-
-        if len(alt_format) > 0:
-            return str(alt_format)

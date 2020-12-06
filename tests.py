@@ -19,8 +19,7 @@ conn = praw.Reddit(
 )
 
 reader = PSAPI(praw=conn)
-reader.max_results_per_request=1000
-start_epoch = int(dt.datetime(2015, 1, 1).timestamp())
+start_epoch = int(dt.datetime(2020, 1, 1).timestamp())
 
 comment_list = list(reader.search_comments(after=start_epoch,
                                            subreddit='wallstreetbets'))

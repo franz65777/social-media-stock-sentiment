@@ -2,13 +2,13 @@
  analyze wallstreetbets comments 
 
 ## TODO
-* Get historial data 2012 to present **Started**
-* Add extra keywords sentiment booster **Not Started**
-* Optimize **Not Started**
+* Get historial data 2012 to present - **Started**
+* Add extra keywords sentiment booster - **Not Started**
+* Optimize - **Not Started**
 * Comment out code -  **Not Started**
 * Create a dash app - **Not Started**
-* Rent / create server to host data **Not Started**
-* Analyze Data **Not Started**
+* Rent / create server to host data - **Not Started**
+* Analyze Data - **Not Started**
 
 ## Finished 
 * Use a try statement for loading excel file - **Not Nedded**

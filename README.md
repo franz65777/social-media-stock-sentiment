@@ -7,6 +7,8 @@
 * add extra keywords sentiment booster **Not Started**
 * port wsb vader sentiment to our repo. - **Not Needed**
 
+
+## Finished 
 * substitute list to dataframe. when appending comments to the ticker object. - **Using Database instead**
 * speed up for loops/ refactor create function -  **Completed**
 * sql database  - **Completed**

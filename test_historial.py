@@ -10,7 +10,7 @@ PUSHSHIFT_REDDIT_URL = "http://api.pushshift.io/reddit"
 
 def fetchObjects(**kwargs):
     # Default params values
-    params = {"sort_type": "created_utc", "sort": "asc", "size": 10000}
+    params = {"sort_type": "created_utc", "sort": "asc", "size": 1000}
     for key, value in kwargs.items():
         params[key] = value
     print(params)
@@ -26,23 +26,26 @@ def fetchObjects(**kwargs):
 
 
 def process(**kwargs):
-    max_created_utc = 0
+    max_created_utc = 1446686449
     max_id = 0
     file = open("data.json", "w")
     while 1:
         nothing_processed = True
         objects = fetchObjects(**kwargs, after=max_created_utc)
-        for object in objects:
-            id = int(object['id'], 36)
-            if id > max_id:
-                nothing_processed = False
-                created_utc = object['created_utc']
-                max_id = id
-                if created_utc > max_created_utc: max_created_utc = created_utc
-                print(object.get("body"))
-        if nothing_processed: return
-        max_created_utc -= 1
-        time.sleep(.5)
+
+        if objects is not None:
+            for obj in objects:
+                id = int(obj['id'], 36)
+                if id > max_id:
+                    nothing_processed = False
+                    created_utc = obj['created_utc']
+                    max_id = id
+                    if created_utc > max_created_utc: max_created_utc = created_utc
+                    print(json.dumps(obj, sort_keys=True, ensure_ascii=True), file=file)
+
+            if nothing_processed: return
+            max_created_utc -= 1
 
 
-print(process(subreddit="wallstreetbets", type="comment"))
+
+process(subreddit="wallstreetbets", type="comment")

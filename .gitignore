@@ -7,6 +7,9 @@
 /dist/
 app/WSBAuthentication.py
 *.xlsx
-tests.py
-tests.py
+tests/tests.py
+tests/tests.py
 !\venv\Lib\site-packages\vaderSentiment
+*.json
+data.json
+*.json

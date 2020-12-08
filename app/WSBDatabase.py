@@ -53,6 +53,7 @@ class Submission(Database):
     def __init__(self):
         super().__init__()
 
+    # insert a new row into a database
     def insert_submission(self, date, user, upvotes, text, ticker, sentiment, position):
         return self.execute(
             sql="""
@@ -60,6 +61,7 @@ class Submission(Database):
             (__datetime, user, upvotes, submission_text, ticker, sentiment, position)
             VALUES(%s, %s, %s, %s, %s, %s, %s)""", params=(date, user, upvotes, text, ticker, sentiment, position,))
 
+    # query submission table from database
     def query_submission(self, ticker, start_date, end_date):
         return self.query(sql="""
         SELECT * FROM wall_street_bets.submissions

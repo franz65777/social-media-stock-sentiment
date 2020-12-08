@@ -3,11 +3,11 @@
 
 ## TODO
 * Add extra keywords sentiment booster - **Not Started**
-* Optimize - **Not Started**
 * Create a dash app - **Not Started**
 * Analyze Data - **Not Started**
 
 ## Finished
+* Optimize - **Started**
 * Get historial data 2012 to present - **Started**
 * Comment out code -  **Completed*
 * Use a try statement for loading excel file - **Not Nedded**

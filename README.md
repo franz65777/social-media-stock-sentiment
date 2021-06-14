@@ -1,21 +1,10 @@
-# WSB-Sentiment
- analyze wallstreetbets comments 
+# About This Project
+ The orginal goal of this project was analyze wallstreetbets comments. Since this projects goals have been expended to analyse muliple social 
 
-## TODO
-* Add extra keywords sentiment booster - **Not Started**
+# TODO
 * Create a dash app - **Not Started**
-* Analyze Data - **Not Started**
 
-## Finished
-* Optimize - **Started**
-* Get historial data 2012 to present - **Started**
-* Comment out code -  **Completed*
-* Use a try statement for loading excel file - **Not Nedded**
-* Substitute list to dataframe. when appending comments to the ticker object. - **Using Database instead**
-* Speed up for loops/ refactor create function -  **Completed**
-* SQL database  - **Completed**
-* Live data **Completed**
-* Change log file type csv -  **Completed**
-* Change "" to '' -  **Completed**
-* Collopses fetch_data and break_up_data into a single function -  **Completed**
 
+# MISC 
+
+This project is 

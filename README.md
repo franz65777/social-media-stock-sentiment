@@ -1,12 +1,10 @@
-
-
 # About This Project
 
-## Orginal Goal
+## Original Goal
 Analyze and interpret stock sentiment / popularity from the WallStreetsBet subreddit.
 
 
-##  Extended Goals
+## Extended Goals
 Analyze and interpret stock sentiment / popularity from multiple social media platforms
 
 # Features

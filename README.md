@@ -7,7 +7,7 @@ Analyze and interpret stock sentiment / popularity from the WallStreetsBet subre
 
 
 ##  Extended Goals
-Analyze and interpret stock sentiment / popularity from social media posts.
+Analyze and interpret stock sentiment / popularity from multiple social media platforms
 
 # Features
 * Find trending stocks.

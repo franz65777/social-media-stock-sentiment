@@ -1,14 +1,22 @@
+
+
 # About This Project
-Analyze and interpret stock sentiment / popularity from social media posts
+
+## Orginal Goal
+Analyze and interpret stock sentiment / popularity from the WallStreetsBet subreddit.
+
+
+##  Extended Goals
+Analyze and interpret stock sentiment / popularity from social media posts.
 
 # Features
-* Find trending stocks
+* Find trending stocks.
 * Real-Time Monitoring.
 * Multiple social platforms supposed.
 * Synchronous data gathering.
 
 # Project Pipeline
 * Create multiple instances of an object that check different social media.
-* find posts that are related to your criteria.
-* append to a database.
-* Query
+* Find posts that are related to your criteria.
+* Append to a database.
+* Query from database.

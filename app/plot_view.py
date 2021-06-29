@@ -8,17 +8,3 @@ from pandas_datareader import data as web
 from datetime import datetime as dt
 import plotly.express as px
 import plotly.graph_objects as go
-
-
-class WallStreetDashboard:
-    def __init__(self):
-        pass
-
-    def default_params(self):
-        pass
-
-    def home_page(self):
-        pass
-
-    def security_in_depth(self):
-        pass

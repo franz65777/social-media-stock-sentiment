@@ -5,7 +5,7 @@
 /build/
 /wsb_sentiment.egg-info/
 /dist/
-app/WSBAuthentication.py
+app/Authentication.py
 *.xlsx
 tests/tests.py
 tests/tests.py

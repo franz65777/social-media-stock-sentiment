@@ -1,5 +1,5 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from app.WSBDatabase import *
+from old.WSBDatabase import *
 import os
 import re
 import praw

@@ -3,53 +3,72 @@ import os
 import re
 import praw
 import pandas as pd
+import asyncio
+import twitter
+import threading
 
 
-class SocialMedia:
+class Analyse:
+    """
+    This Class analyses the comments after they have been find (reddit and twitter classes).
+    The Reddit and Twitter classes send their data to this class to get processed.
+    """
     def __init__(self):
+        self.data_bundle = []
         self.sia = SentimentIntensityAnalyzer()
         self.dir_name = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.ticker_list = pd.read_csv(self.dir_name + '\\dependencies\\ticker_list.csv')
 
-    # saves all comments to a csv document saved in 'logs'
-    def debug(self, data=pd.DataFrame()):
-        return data.to_csv(self.dir_name + '\\dependencies\\log.csv')
-
-    # check if a ticker exists in a comment
-    def ticker(self, text):
-        found_flag = 0
-        ticker = ''
-        for ticker_name in self.ticker_list['Symbol']:
-            ticker_pattern = re.compile(r'\b%s\b' % ticker_name)
-            if len(ticker_pattern.findall(str(text))) > 0:
-                found_flag = 1
-                ticker = ticker_name
-                return ticker
-        if found_flag == 0:
-            ticker = ''
-            return ticker
+    def add_to_queue(self, data_packet):
+        self.data_bundle.append(data_packet)
+        return self.data_bundle
 
 
-class Reddit(SocialMedia):
-    def __init__(self, autho_dict, posts):
-        super().__init__()
-        self.authentication = autho_dict
-        self.posts = posts
+class Delivery:
+    """
+    This class add data via the users settings e.g. to a database or csv or another file formate
+    """
+    def __init__(self):
+        pass
 
-    @property
-    # creates instance of reddit using authentication from app.WSBAuthentication
-    def connect(self):
-        return praw.Reddit(
-            client_id=self.authentication.get('app_id'),
-            client_secret=self.authentication.get('secret'),
-            username=self.authentication.get('username'),
-            password=self.authentication.get('password'),
-            user_agent=self.authentication.get('user_agent')
-        )
+    def to_csv(self):
+        pass
+
+    def to_db(self):
+        pass
+
+    def to_excel(self):
+        pass
 
 
-class Twitter(SocialMedia):
-    def __init__(self, autho_dict, posts):
-        super().__init__()
-        self.authentication = autho_dict
-        self.posts = posts
+class Reddit:
+    """
+    This class revives data stream from reddit
+    TODO: check if it can understand polls
+    TODO: view posts and add it as well
+    TODO:
+    """
+    def __init__(self, client_id, client_secret, username, password, user_agent):
+        self.connection = praw.Reddit(client_id=client_id, client_secret=client_secret, username=username,
+                                      password=password, user_agent=user_agent)
+
+    def results(self, reddit_stream):
+        reddit_stream = self.connection.subreddit(reddit_stream)
+
+        for comment in reddit_stream.stream.comments(skip_existing=True):
+            print(comment.subreddit)
+
+
+class Twitter:
+    """
+    This class revives data stream from twitter
+    TODO: check if it can understand polls
+    TODO: view posts and add it as well as replies
+    TODO: get api
+    """
+    def __init__(self, consumer_key, consumer_secret, access_token_key, access_token_secret):
+        self.connection = twitter.Api(consumer_key=consumer_key, consumer_secret=consumer_secret,
+                                      access_token_key=access_token_key, access_token_secret=access_token_secret)
+
+    def results(self, data_wanted):
+        pass

@@ -10,7 +10,7 @@ PUSHSHIFT_REDDIT_URL = "http://api.pushshift.io/reddit"
 
 def fetchObjects(**kwargs):
     # Default params values
-    params = {"sort_type": "created_utc", "sort": "asc", "size": 1000}
+    params = {"sort_type": "created_utc", "sort": "asc", "size": 10}
     for key, value in kwargs.items():
         params[key] = value
     print(params)
@@ -48,4 +48,4 @@ def process(**kwargs):
 
 
 
-process(subreddit="wallstreetbets", type="comment")
+process(subreddit="securityanalysis", type="comment")

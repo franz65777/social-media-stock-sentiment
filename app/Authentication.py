@@ -1,16 +1,15 @@
-redddit = {
-    'app_id': 'AuUIHLYhwPDurw',
-    'secret': 'r-h6vCcjnhl8WLMyWJuDaxhh2MuM2A',
-    'username': 'wsbtestbot69420',
-    'password': 'qgVi7zceCJwz2B9',
-    'user_agent': "WSB Sentiment Test Bot"
+reddit = {
+    'app_id': '',
+    'secret': '',
+    'username': '',
+    'password': '',
+    'user_agent': ""
     }
 
 
 twitter = {
-    'app_id': 'AuUIHLYhwPDurw',
-    'secret': 'r-h6vCcjnhl8WLMyWJuDaxhh2MuM2A',
-    'username': 'wsbtestbot69420',
-    'password': 'qgVi7zceCJwz2B9',
-    'user_agent': "WSB Sentiment Test Bot"
+    'consumer_key': '',
+    'consumer_secret': '',
+    'access_token_key': '',
+    'access_token_secret': ''
     }

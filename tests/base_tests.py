@@ -1,13 +1,40 @@
+from threading import Thread
 import app.data_gathering as data
-import app.Authentication as authentication
-import datetime as dt
 
-reddit = data.Reddit(client_id=authentication.reddit.get('app_id'),
-                     client_secret=authentication.reddit.get('secret'),
-                     username=authentication.reddit.get('username'),
-                     password=authentication.reddit.get('password'),
-                     user_agent=authentication.reddit.get('user_agent'))
+reddit_cred = {
+    'app_id': '',
+    'secret': '',
+    'username': '',
+    'password': '',
+    'user_agent': ""
+    }
 
-# ["investing", "cryptocurrency", "securityanalysis", "wallstreetbets"]
 
-reddit.results(reddit_stream="investing+securityanalysis+cryptocurrency+wallstreetbets")
+twitter_cred = {
+    'consumer_key': '',
+    'consumer_secret': '',
+    'access_token_key': '',
+    'access_token_secret': ''
+    }
+
+reddit = data.Reddit(client_id=reddit_cred.get('app_id'),
+                     client_secret=reddit_cred.get('secret'),
+                     username=reddit_cred.get('username'),
+                     password=reddit_cred.get('password'),
+                     user_agent=reddit_cred.get('user_agent'))
+
+twitter = data.Twitter(con_key=twitter_cred.get("consumer_key"),
+                       con_secret=twitter_cred.get("consumer_secret"),
+                       access_key=twitter_cred.get("access_token_key"),
+                       access_secret=twitter_cred.get("access_token_secret"))
+
+
+def main():
+    t1 = Thread(target=reddit.stream_reddit, args=["investing+cryptocurrency+securityanalysis+wallstreetbets"])
+    t2 = Thread(target=twitter.stream_twitter, args=[["trading", "bitcoin"], ["en"]])
+    t1.start()
+    t2.start()
+
+
+if __name__ == '__main__':
+    main()

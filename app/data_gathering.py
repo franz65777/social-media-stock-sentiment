@@ -1,74 +1,82 @@
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import os
 import re
-import praw
+from datetime import datetime as dt
 import pandas as pd
-import asyncio
-import twitter
-import threading
+import praw
+from twitter import Api
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
 class Analyse:
-    """
-    This Class analyses the comments after they have been find (reddit and twitter classes).
-    The Reddit and Twitter classes send their data to this class to get processed.
-    """
     def __init__(self):
-        self.data_bundle = []
         self.sia = SentimentIntensityAnalyzer()
         self.dir_name = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.ticker_list = pd.read_csv(self.dir_name + '\\dependencies\\ticker_list.csv')
 
-    def add_to_queue(self, data_packet):
-        self.data_bundle.append(data_packet)
-        return self.data_bundle
+    # check if a ticker exists in a comment
+    def ticker(self, text):
+        found_flag = 0
+        ticker = ''
+        for ticker_name in self.ticker_list['Symbol']:
+            ticker_pattern = re.compile(r'\b%s\b' % ticker_name)
+            if len(ticker_pattern.findall(str(text))) > 0:
+                found_flag = 1
+                ticker = ticker_name
+                return ticker
+        if found_flag == 0:
+            ticker = ''
+            return ticker
 
-
-class Delivery:
-    """
-    This class add data via the users settings e.g. to a database or csv or another file formate
-    """
-    def __init__(self):
-        pass
-
-    def to_csv(self):
-        pass
-
-    def to_db(self):
-        pass
-
-    def to_excel(self):
-        pass
+    def update_comments(self, element):
+        element["ticker"] = self.ticker(element["text"])
+        element["sentiment"] = self.sia.polarity_scores(element["text"])['compound']
+        return element
 
 
 class Reddit:
-    """
-    This class revives data stream from reddit
-    TODO: check if it can understand polls
-    TODO: view posts and add it as well
-    TODO:
-    """
     def __init__(self, client_id, client_secret, username, password, user_agent):
         self.connection = praw.Reddit(client_id=client_id, client_secret=client_secret, username=username,
                                       password=password, user_agent=user_agent)
+        self.comment_bundle = []
 
-    def results(self, reddit_stream):
+    def stream_reddit(self, reddit_stream):
         reddit_stream = self.connection.subreddit(reddit_stream)
-
         for comment in reddit_stream.stream.comments(skip_existing=True):
-            print(comment.subreddit)
+            comment_dict = {
+                'datetime': dt.utcfromtimestamp(comment.created_utc).strftime('%Y-%m-%d %H:%M:%S'),
+                'sub_reddit': str(comment.subreddit),
+                'platform': "Reddit",
+                'text': comment.body
+            }
+            self.comment_bundle.append(comment_dict)
+            print(comment_dict)
 
 
 class Twitter:
-    """
-    This class revives data stream from twitter
-    TODO: check if it can understand polls
-    TODO: view posts and add it as well as replies
-    TODO: get api
-    """
-    def __init__(self, consumer_key, consumer_secret, access_token_key, access_token_secret):
-        self.connection = twitter.Api(consumer_key=consumer_key, consumer_secret=consumer_secret,
-                                      access_token_key=access_token_key, access_token_secret=access_token_secret)
+    def __init__(self, con_key, con_secret, access_key, access_secret):
+        self.connection = Api(consumer_key=con_key, consumer_secret=con_secret,
+                              access_token_key=access_key, access_token_secret=access_secret)
+        self.comment_bundle = []
 
-    def results(self, data_wanted):
-        pass
+    def stream_twitter(self, twitter_stream, lang="en"):
+        for line in self.connection.GetStreamFilter(track=twitter_stream, languages=lang, filter_level="low"):
+            if 'extended_tweet' in line:
+                text = line["extended_tweet"]["full_text"]
+
+            if 'retweeted_status' in line:
+                text = line["retweeted_status"]["text"]
+
+            else:
+                text = line['text']
+
+            text = re.sub(r"\S*https?:\S*", "", text)
+            text = text.strip()
+            text.replace("\\n", " . ")
+
+            comment_dict = {
+                'datetime': dt.utcfromtimestamp(int(line["timestamp_ms"][0:-3])).strftime('%Y-%m-%d %H:%M:%S'),
+                'text': text,
+                'platform': "Twitter"
+            }
+            self.comment_bundle.append(comment_dict)
+            print(comment_dict)

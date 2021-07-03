@@ -13,3 +13,4 @@ tests/tests.py
 *.json
 data.json
 *.json
+/.spyproject/

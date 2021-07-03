@@ -2,8 +2,8 @@ import os
 import re
 from datetime import datetime as dt
 import pandas as pd
-import praw
-from twitter import Api
+from praw import Reddit as _reddit_
+from twitter import Api as _twitter_
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
@@ -27,56 +27,66 @@ class Analyse:
             ticker = ''
             return ticker
 
+    # update the dict with new keys
     def update_comments(self, element):
-        element["ticker"] = self.ticker(element["text"])
-        element["sentiment"] = self.sia.polarity_scores(element["text"])['compound']
+        element['ticker'] = self.ticker(element['text'])
+        element['sentiment'] = self.sia.polarity_scores(element['text'])['compound']
         return element
 
 
 class Reddit:
     def __init__(self, client_id, client_secret, username, password, user_agent):
-        self.connection = praw.Reddit(client_id=client_id, client_secret=client_secret, username=username,
-                                      password=password, user_agent=user_agent)
+        self.connection = _reddit_(client_id=client_id, client_secret=client_secret, username=username,
+                                   password=password, user_agent=user_agent)
+        self.dir_name = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.comment_bundle = []
 
-    def stream_reddit(self, reddit_stream):
-        reddit_stream = self.connection.subreddit(reddit_stream)
-        for comment in reddit_stream.stream.comments(skip_existing=True):
+    # select the subreddits you want to stream in real-time
+    def stream(self, subreddits):
+        reddit_stream = self.connection.subreddit(subreddits)
+        for line in reddit_stream.stream.comments(skip_existing=True):
             comment_dict = {
-                'datetime': dt.utcfromtimestamp(comment.created_utc).strftime('%Y-%m-%d %H:%M:%S'),
-                'sub_reddit': str(comment.subreddit),
-                'platform': "Reddit",
-                'text': comment.body
+                'datetime': dt.utcfromtimestamp(line.created_utc).strftime('%Y-%m-%d %H:%M:%S'),
+                'sub_reddit': str(line.subreddit),
+                'platform': 'Reddit',
+                'text': line.body
             }
+
+            comment_dict = Analyse().update_comments(comment_dict)
             self.comment_bundle.append(comment_dict)
             print(comment_dict)
 
 
 class Twitter:
     def __init__(self, con_key, con_secret, access_key, access_secret):
-        self.connection = Api(consumer_key=con_key, consumer_secret=con_secret,
-                              access_token_key=access_key, access_token_secret=access_secret)
+        self.connection = _twitter_(consumer_key=con_key, consumer_secret=con_secret,
+                                    access_token_key=access_key, access_token_secret=access_secret)
+        self.dir_name = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.comment_bundle = []
 
-    def stream_twitter(self, twitter_stream, lang="en"):
-        for line in self.connection.GetStreamFilter(track=twitter_stream, languages=lang, filter_level="low"):
+    # select the tweets you want to stream in real-time based on the contents of the tweet
+    def stream(self, track_words, language='en'):
+        for line in self.connection.GetStreamFilter(track=track_words, languages=language, filter_level='low'):
+
+            # We need to find text in the tweet use cases
             if 'extended_tweet' in line:
-                text = line["extended_tweet"]["full_text"]
+                text = line['extended_tweet']['full_text']
 
             if 'retweeted_status' in line:
-                text = line["retweeted_status"]["text"]
+                text = line['retweeted_status']['text']
 
             else:
                 text = line['text']
 
-            text = re.sub(r"\S*https?:\S*", "", text)
+            # This removes any links inside the of the string and cleans the string up
+            text = re.sub(r'\S*https?:\S*', '', text)
             text = text.strip()
-            text.replace("\\n", " . ")
 
             comment_dict = {
-                'datetime': dt.utcfromtimestamp(int(line["timestamp_ms"][0:-3])).strftime('%Y-%m-%d %H:%M:%S'),
+                'datetime': dt.utcfromtimestamp(int(line['timestamp_ms'][0:-3])).strftime('%Y-%m-%d %H:%M:%S'),
                 'text': text,
-                'platform': "Twitter"
+                'platform': 'Twitter'
             }
+            comment_dict = Analyse().update_comments(comment_dict)
             self.comment_bundle.append(comment_dict)
             print(comment_dict)

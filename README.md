@@ -6,3 +6,7 @@ Gather, monitor and store data related to different stocks on  muliple media pla
    * Twitter 
    * Reddit 
 * Real-time monitoring enabled with plotly dash package
+
+
+# TODO
+* Work on Dash app
